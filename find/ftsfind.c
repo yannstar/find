@@ -69,6 +69,12 @@ static int ftsoptions = FTS_NOSTAT|FTS_TIGHT_CYCLE_CHECK|FTS_CWDFD|FTS_VERBATIM;
 static int prev_depth = INT_MIN; /* fts_level can be < 0 */
 static int curr_fd = -1;
 
+static int
+fts_compare_names (const FTSENT **a, const FTSENT **b)
+{
+  return strcmp ((*a)->fts_name, (*b)->fts_name);
+}
+
 
 static bool find (char *arg) __attribute_warn_unused_result__;
 static bool process_all_startpoints (int argc, char *argv[]) __attribute_warn_unused_result__;
@@ -486,7 +492,7 @@ find (char *arg)
   if (options.xdev)
     ftsoptions |= FTS_XDEV;
 
-  p = fts_open (arglist, ftsoptions, nullptr);
+  p = fts_open (arglist, ftsoptions, fts_compare_names);
   if (nullptr == p)
     {
       error (0, errno, _("cannot search %s"),
